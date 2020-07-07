@@ -39,7 +39,6 @@ var pullCmd = &cobra.Command{
 		if err != nil {
 			logrus.Fatal(err)
 		}
-		imageOverride, _ := cmd.Flags().GetString("image")
 		targetComponent := ""
 		if len(args) != 0 {
 			targetComponent = args[0]
@@ -47,9 +46,6 @@ var pullCmd = &cobra.Command{
 		for _, component := range cfg.Components {
 			if targetComponent == component.Name || targetComponent == "" {
 				logrus.Infof("pulling %s", component.Name)
-				if imageOverride != "" {
-					component.Image = imageOverride
-				}
 				err = podman.PullImage(cfg, component)
 				if err != nil {
 					logrus.Fatal(err)
@@ -61,7 +57,6 @@ var pullCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(pullCmd)
-	pullCmd.Flags().String("image", "", "override pull image")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

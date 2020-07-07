@@ -58,11 +58,15 @@ var recreateCmd = &cobra.Command{
 				logrus.Fatal(err)
 			}
 		} else {
+			image, _ := cmd.Flags().GetString("image")
 			for _, component := range cfg.Components {
 				if args[0] == component.Name {
 					logrus.Infof("recreating container for %s", component.Name)
 					_ = podman.StopContainer(cfg, component)
 					_ = podman.DeleteContainer(cfg, component)
+					if image != "" {
+						component.Image = image
+					}
 					err = podman.CreateContainer(cfg, component)
 					if err != nil {
 						logrus.Fatal(err)
@@ -80,14 +84,5 @@ var recreateCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(recreateCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// recreateCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// recreateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	recreateCmd.Flags().String("image", "", "override image")
 }
