@@ -1,0 +1,14 @@
+---
+name: simple
+ports:
+  "8080": "80"
+volumes:
+  hostpath: ./
+  vol1: ""
+components:
+  - name: alpine1
+    image: alpine:latest
+    cmd: ["tail", "-f", "/dev/null"]
+    mounts:
+      hostpath: /mount1
+      vol1: /mount2
