@@ -28,7 +28,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/trusch/stackctl/pkg/config"
+	"github.com/trusch/stackctl/pkg/compose"
 )
 
 // runCmd represents the run command
@@ -37,17 +37,21 @@ var runCmd = &cobra.Command{
 	Short: "run commands from your stackfile",
 	Long:  `run commands from your stackfile.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("file")
-		cfg, err := config.Load(file)
+		file, _ := cmd.Flags().GetString("compose-file")
+		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
 		if len(args) == 0 {
 			logrus.Fatal("you have to specify a command")
 		}
-		command, ok := cfg.Commands[args[0]]
+		commands, ok := project.Extensions["x-commands"].(map[string]interface{})
 		if !ok {
-			logrus.Fatal("can't find command")
+			logrus.Fatal("can't find x-commands")
+		}
+		command, ok := commands[args[0]].(string)
+		if !ok {
+			logrus.Fatalf("can't find command %s", args[0])
 		}
 		args = append([]string{command}, args[1:]...)
 		c := exec.Command("sh", "-c", strings.Join(args, " "))

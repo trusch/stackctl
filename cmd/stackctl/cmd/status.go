@@ -24,8 +24,8 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/trusch/stackctl/pkg/config"
-	"github.com/trusch/stackctl/pkg/podman"
+	"github.com/trusch/stackctl/pkg/actions"
+	"github.com/trusch/stackctl/pkg/compose"
 )
 
 // statusCmd represents the status command
@@ -34,12 +34,16 @@ var statusCmd = &cobra.Command{
 	Short: "check your stacks status",
 	Long:  `check your stacks status.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("file")
-		cfg, err := config.Load(file)
+		file, _ := cmd.Flags().GetString("compose-file")
+		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
-		err = podman.Status(cfg)
+		status, err := actions.GetStatus(cmd.Context(), project)
+		if err != nil {
+			logrus.Fatal(err)
+		}
+		err = status.Print()
 		if err != nil {
 			logrus.Fatal(err)
 		}

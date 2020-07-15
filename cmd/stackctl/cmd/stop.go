@@ -24,8 +24,8 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/trusch/stackctl/pkg/config"
-	"github.com/trusch/stackctl/pkg/podman"
+	"github.com/trusch/stackctl/pkg/actions"
+	"github.com/trusch/stackctl/pkg/compose"
 )
 
 // stopCmd represents the stop command
@@ -34,22 +34,22 @@ var stopCmd = &cobra.Command{
 	Short: "stop the whole stack or just components",
 	Long:  `stop the whole stack or just components.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("file")
-		cfg, err := config.Load(file)
+		file, _ := cmd.Flags().GetString("compose-file")
+		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
 		if len(args) == 0 {
 			logrus.Infof("stopping pod")
-			err = podman.StopPod(cfg)
+			err = actions.StopPod(cmd.Context(), project)
 			if err != nil {
 				logrus.Fatal(err)
 			}
 		} else {
-			for _, component := range cfg.Components {
-				if args[0] == component.Name {
-					logrus.Infof("stopping container for %s", component.Name)
-					err = podman.StopContainer(cfg, component)
+			for _, component := range project.ServiceNames() {
+				if args[0] == component {
+					logrus.Infof("stopping container for %s", component)
+					err = actions.StopService(cmd.Context(), project, component)
 					if err != nil {
 						logrus.Fatal(err)
 					}

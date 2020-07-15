@@ -22,10 +22,14 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"bytes"
+	"html/template"
+
+	"github.com/compose-spec/compose-go/types"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/trusch/stackctl/pkg/config"
-	"github.com/trusch/stackctl/pkg/podman"
+	"github.com/trusch/stackctl/pkg/actions"
+	"github.com/trusch/stackctl/pkg/compose"
 )
 
 // recreateCmd represents the recreate command
@@ -34,55 +38,55 @@ var recreateCmd = &cobra.Command{
 	Short: "recreate your pod or just components",
 	Long:  `recreate your pod or just components.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("file")
-		cfg, err := config.Load(file)
+		file, _ := cmd.Flags().GetString("compose-file")
+		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
-		if len(args) == 0 {
-			logrus.Infof("recreating pod")
-			_ = podman.StopPod(cfg)
-			_ = podman.DeletePod(cfg)
-			err = podman.CreatePod(cfg)
-			if err != nil {
-				logrus.Fatal(err)
-			}
-			for _, component := range cfg.Components {
-				err = podman.CreateContainer(cfg, component)
-				if err != nil {
-					logrus.Fatal(err)
-				}
-			}
-			err = podman.StartPod(cfg)
-			if err != nil {
-				logrus.Fatal(err)
-			}
-		} else {
+		if len(args) == 1 {
 			image, _ := cmd.Flags().GetString("image")
-			for _, component := range cfg.Components {
-				if args[0] == component.Name {
-					logrus.Infof("recreating container for %s", component.Name)
-					_ = podman.StopContainer(cfg, component)
-					_ = podman.DeleteContainer(cfg, component)
+			pr, _ := cmd.Flags().GetString("with-pr")
+			for idx, svc := range project.Services {
+				if svc.Name == args[0] {
 					if image != "" {
-						component.Image = image
+						project.Services[idx].Image = image
 					}
-					err = podman.CreateContainer(cfg, component)
-					if err != nil {
-						logrus.Fatal(err)
+					if pr != "" {
+						project.Services[idx].Image = getPullRequestImage(project, svc, pr)
 					}
-					err = podman.StartContainer(cfg, component)
-					if err != nil {
-						logrus.Fatal(err)
-					}
-					break
 				}
 			}
 		}
+		err = actions.Recreate(cmd.Context(), project, args)
 	},
+}
+
+func getPullRequestImage(project *types.Project, svc types.ServiceConfig, pr string) string {
+	tmplInterface, ok := svc.Extensions["x-pr-template"]
+	if !ok {
+		tmplInterface, ok = project.Extensions["x-pr-template"]
+		if !ok {
+			logrus.Fatal("no x-pr-template entry found")
+		}
+	}
+	tmplStr, ok := tmplInterface.(string)
+	if !ok {
+		logrus.Fatal("x-pr-template is not a string")
+	}
+	tmpl, err := template.New("pr-template").Parse(tmplStr)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	buf := &bytes.Buffer{}
+	err = tmpl.Execute(buf, struct{ Service, PR string }{svc.Name, pr})
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	return buf.String()
 }
 
 func init() {
 	rootCmd.AddCommand(recreateCmd)
 	recreateCmd.Flags().String("image", "", "override image")
+	recreateCmd.Flags().String("with-pr", "", "override image by using the PR template")
 }

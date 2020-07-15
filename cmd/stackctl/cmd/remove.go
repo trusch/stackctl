@@ -24,8 +24,8 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/trusch/stackctl/pkg/config"
-	"github.com/trusch/stackctl/pkg/podman"
+	"github.com/trusch/stackctl/pkg/actions"
+	"github.com/trusch/stackctl/pkg/compose"
 )
 
 // removeCmd represents the remove command
@@ -34,22 +34,19 @@ var removeCmd = &cobra.Command{
 	Short: "remove the whole stack or just components",
 	Long:  `remove the whole stack or just components.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("file")
-		cfg, err := config.Load(file)
-		if err != nil {
-			logrus.Fatal(err)
-		}
+		file, _ := cmd.Flags().GetString("compose-file")
+		project, err := compose.Load(file)
 		if len(args) == 0 {
 			logrus.Infof("removing pod")
-			err = podman.DeletePod(cfg)
+			err = actions.RemovePod(cmd.Context(), project)
 			if err != nil {
 				logrus.Fatal(err)
 			}
 		} else {
-			for _, component := range cfg.Components {
-				if args[0] == component.Name {
-					logrus.Infof("removing container for %s", component.Name)
-					err = podman.DeleteContainer(cfg, component)
+			for _, svc := range project.ServiceNames() {
+				if args[0] == svc {
+					logrus.Infof("removing service %s", svc)
+					err = actions.RemoveService(cmd.Context(), project, svc)
 					if err != nil {
 						logrus.Fatal(err)
 					}

@@ -26,8 +26,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/trusch/stackctl/pkg/config"
-	"github.com/trusch/stackctl/pkg/podman"
+	"github.com/trusch/stackctl/pkg/actions"
+	"github.com/trusch/stackctl/pkg/compose"
 )
 
 // logsCmd represents the logs command
@@ -42,8 +42,8 @@ var logsCmd = &cobra.Command{
 			follow bool
 			err    error
 		)
-		file, _ := cmd.Flags().GetString("file")
-		cfg, err := config.Load(file)
+		file, _ := cmd.Flags().GetString("compose-file")
+		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -56,7 +56,10 @@ var logsCmd = &cobra.Command{
 		}
 		tail, _ = cmd.Flags().GetInt("tail")
 		follow, _ = cmd.Flags().GetBool("follow")
-		err = podman.Logs(cfg, args, since, tail, follow)
+		err = actions.Logs(cmd.Context(), project, args, since, tail, follow)
+		if err != nil {
+			logrus.Fatal(err)
+		}
 	},
 }
 
@@ -64,5 +67,5 @@ func init() {
 	rootCmd.AddCommand(logsCmd)
 	logsCmd.Flags().String("since", "", "show logs since timestamp")
 	logsCmd.Flags().IntP("tail", "t", 0, "show latest N lines from the end of the log")
-	logsCmd.Flags().Bool("follow", false, "follow new logs")
+	logsCmd.Flags().BoolP("follow", "f", false, "follow new logs")
 }

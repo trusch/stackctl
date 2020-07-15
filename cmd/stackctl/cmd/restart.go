@@ -24,53 +24,25 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/trusch/stackctl/pkg/config"
-	"github.com/trusch/stackctl/pkg/podman"
+	"github.com/trusch/stackctl/pkg/actions"
+	"github.com/trusch/stackctl/pkg/compose"
 )
 
 // restartCmd represents the restart command
 var restartCmd = &cobra.Command{
 	Use:   "restart",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "restart all or some services",
+	Long:  `restart all or some services.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("file")
-		cfg, err := config.Load(file)
+		file, _ := cmd.Flags().GetString("compose-file")
+		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
-		if len(args) == 0 {
-			logrus.Infof("restarting pod")
-			err = podman.StopPod(cfg)
-			if err != nil {
-				logrus.Warn(err)
-			}
-			err = podman.StartPod(cfg)
-			if err != nil {
-				logrus.Fatal(err)
-			}
-		} else {
-			for _, component := range cfg.Components {
-				if args[0] == component.Name {
-					logrus.Infof("restarting container for %s", component.Name)
-					err = podman.StopContainer(cfg, component)
-					if err != nil {
-						logrus.Warn(err)
-					}
-					err = podman.StartContainer(cfg, component)
-					if err != nil {
-						logrus.Fatal(err)
-					}
-					break
-				}
-			}
+		err = actions.Restart(cmd.Context(), project, args)
+		if err != nil {
+			logrus.Fatal(err)
 		}
-
 	},
 }
 

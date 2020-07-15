@@ -1,0 +1,27 @@
+version: "3.9"
+x-project-name: testproject
+x-my-global-extension: foobar
+services:
+  foo:
+    image: alpine:latest
+    command: ["tail","-f","/dev/null"]
+    x-my-extension: foobar
+    ports:
+      - 8080:80
+    volumes:
+      - vol-1:/vol-1
+      - vol-2:/vol-2
+      - ./:/vol-3
+    configs:
+      - cfg-1
+    secrets:
+      - secret-1
+volumes:
+  vol-1:
+  vol-2:
+configs:
+  cfg-1:
+    file: ./
+secrets:
+  secret-1:
+    file: ./

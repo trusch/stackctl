@@ -24,8 +24,8 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/trusch/stackctl/pkg/config"
-	"github.com/trusch/stackctl/pkg/podman"
+	"github.com/trusch/stackctl/pkg/actions"
+	"github.com/trusch/stackctl/pkg/compose"
 )
 
 // createCmd represents the create command
@@ -34,22 +34,22 @@ var createCmd = &cobra.Command{
 	Short: "create creates the whole stack or just single components",
 	Long:  `create creates the whole stack or just single components.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("file")
-		cfg, err := config.Load(file)
+		file, _ := cmd.Flags().GetString("compose-file")
+		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
 		if len(args) == 0 || args[0] == "pod" {
 			logrus.Infof("creating pod")
-			err = podman.CreatePod(cfg)
+			err = actions.CreatePod(cmd.Context(), project)
 			if err != nil {
 				logrus.Fatal(err)
 			}
 		}
-		for _, component := range cfg.Components {
-			if len(args) == 0 || args[0] == component.Name {
-				logrus.Infof("creating container for %s", component.Name)
-				err = podman.CreateContainer(cfg, component)
+		for _, svc := range project.ServiceNames() {
+			if len(args) == 0 || args[0] == svc {
+				logrus.Infof("creating container for %s", svc)
+				err = actions.CreateService(cmd.Context(), project, svc)
 				if err != nil {
 					logrus.Fatal(err)
 				}

@@ -24,8 +24,8 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/trusch/stackctl/pkg/config"
-	"github.com/trusch/stackctl/pkg/podman"
+	"github.com/trusch/stackctl/pkg/actions"
+	"github.com/trusch/stackctl/pkg/compose"
 )
 
 // pullCmd represents the pull command
@@ -34,8 +34,8 @@ var pullCmd = &cobra.Command{
 	Short: "pull component images",
 	Long:  `pull component images.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("file")
-		cfg, err := config.Load(file)
+		file, _ := cmd.Flags().GetString("compose-file")
+		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -43,10 +43,10 @@ var pullCmd = &cobra.Command{
 		if len(args) != 0 {
 			targetComponent = args[0]
 		}
-		for _, component := range cfg.Components {
-			if targetComponent == component.Name || targetComponent == "" {
-				logrus.Infof("pulling %s", component.Name)
-				err = podman.PullImage(cfg, component)
+		for _, svc := range project.ServiceNames() {
+			if targetComponent == svc || targetComponent == "" {
+				logrus.Infof("pulling %s", svc)
+				err = actions.Pull(cmd.Context(), project, svc)
 				if err != nil {
 					logrus.Fatal(err)
 				}

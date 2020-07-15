@@ -24,8 +24,8 @@ package cmd
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/trusch/stackctl/pkg/config"
-	"github.com/trusch/stackctl/pkg/podman"
+	"github.com/trusch/stackctl/pkg/actions"
+	"github.com/trusch/stackctl/pkg/compose"
 )
 
 // resetCmd represents the reset command
@@ -34,22 +34,14 @@ var resetCmd = &cobra.Command{
 	Short: "kill and remove everything and burn down your volumes",
 	Long:  `kill and remove everything and burn down your volumes.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("file")
-		cfg, err := config.Load(file)
+		file, _ := cmd.Flags().GetString("compose-file")
+		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
-		err = podman.StopPod(cfg)
+		err = actions.Reset(cmd.Context(), project)
 		if err != nil {
-			logrus.Warn(err)
-		}
-		err = podman.DeletePod(cfg)
-		if err != nil {
-			logrus.Warn(err)
-		}
-		err = podman.DeleteVolumes(cfg)
-		if err != nil {
-			logrus.Warn(err)
+			logrus.Fatal(err)
 		}
 	},
 }
