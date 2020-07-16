@@ -38,7 +38,7 @@ var recreateCmd = &cobra.Command{
 	Short: "recreate your pod or just components",
 	Long:  `recreate your pod or just components.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("compose-file")
+		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
@@ -58,6 +58,9 @@ var recreateCmd = &cobra.Command{
 			}
 		}
 		err = actions.Recreate(cmd.Context(), project, args)
+		if err != nil {
+			logrus.Fatal(err)
+		}
 	},
 }
 

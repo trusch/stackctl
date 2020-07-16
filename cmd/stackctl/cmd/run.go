@@ -37,7 +37,7 @@ var runCmd = &cobra.Command{
 	Short: "run commands from your stackfile",
 	Long:  `run commands from your stackfile.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("compose-file")
+		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)

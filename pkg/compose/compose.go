@@ -9,36 +9,37 @@ import (
 	"github.com/compose-spec/compose-go/types"
 )
 
-func Load(file string) (project *types.Project, err error) {
-	bs, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-	contents, err := loader.ParseYAML(bs)
+func Load(files []string) (project *types.Project, err error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
-	project, err = loader.Load(types.ConfigDetails{
-		Version:    "3.9",
-		WorkingDir: wd,
-		ConfigFiles: []types.ConfigFile{
-			{
-				Filename: file,
-				Config:   contents,
-			},
-		},
+	configDetails := types.ConfigDetails{
+		Version:     "3.9",
+		WorkingDir:  wd,
+		ConfigFiles: []types.ConfigFile{},
 		Environment: map[string]string{},
-	})
-	if err != nil {
-		return nil, err
 	}
 
-	path, err := filepath.Abs(file)
+	for _, f := range files {
+		bs, err := ioutil.ReadFile(f)
+		if err != nil {
+			return nil, err
+		}
+		contents, err := loader.ParseYAML(bs)
+		if err != nil {
+			return nil, err
+		}
+		configDetails.ConfigFiles = append(configDetails.ConfigFiles, types.ConfigFile{
+			Filename: f,
+			Config:   contents,
+		})
+	}
+	project, err = loader.Load(configDetails)
 	if err != nil {
 		return nil, err
 	}
-	project.Name = filepath.Base(filepath.Dir(path))
+	project.Name = filepath.Base(wd)
 
 	return project, nil
 }

@@ -30,11 +30,12 @@ import (
 
 // removeCmd represents the remove command
 var removeCmd = &cobra.Command{
-	Use:   "remove",
-	Short: "remove the whole stack or just components",
-	Long:  `remove the whole stack or just components.`,
+	Use:     "remove",
+	Aliases: []string{"down", "delete"},
+	Short:   "remove the whole stack or just components",
+	Long:    `remove the whole stack or just components.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("compose-file")
+		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
 		if len(args) == 0 {
 			logrus.Infof("removing pod")
@@ -58,14 +59,4 @@ var removeCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(removeCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// removeCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// removeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

@@ -60,7 +60,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringP("compose-file", "c", "compose.yaml", "location of the compose file")
+	rootCmd.PersistentFlags().StringSliceP("compose-file", "c", []string{"compose.yaml"}, "location of the compose file")
 	rootCmd.PersistentFlags().String("log-level", "INFO", "log level")
 }
 

@@ -41,6 +41,16 @@ func CreatePod(ctx context.Context, project *types.Project) error {
 		}
 	}
 
+	if portsInterface, ok := project.Extensions["x-ports"]; ok {
+		if portsObj, ok := portsInterface.(map[string]interface{}); ok {
+			for k, v := range portsObj {
+				if target, ok := v.(string); ok {
+					args = append(args, "-p", k+":"+target)
+				}
+			}
+		}
+	}
+
 	cmd := exec.CommandContext(ctx, "podman", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

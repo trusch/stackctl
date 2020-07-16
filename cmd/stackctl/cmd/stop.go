@@ -34,7 +34,7 @@ var stopCmd = &cobra.Command{
 	Short: "stop the whole stack or just components",
 	Long:  `stop the whole stack or just components.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("compose-file")
+		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)

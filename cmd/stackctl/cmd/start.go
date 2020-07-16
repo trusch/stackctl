@@ -34,7 +34,7 @@ var startCmd = &cobra.Command{
 	Short: "start the stack or just one component",
 	Long:  `start the stack or just one component.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("compose-file")
+		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)

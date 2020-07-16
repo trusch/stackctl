@@ -34,7 +34,7 @@ var createCmd = &cobra.Command{
 	Short: "create creates the whole stack or just single components",
 	Long:  `create creates the whole stack or just single components.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("compose-file")
+		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)

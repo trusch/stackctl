@@ -33,7 +33,7 @@ func GetStatus(ctx context.Context, project *types.Project) (results ProjectStat
 		if len(parts) == 4 {
 			results = append(results, Status{
 				ID:     parts[0],
-				Name:   parts[1],
+				Name:   parts[1][len(project.Name)+1:],
 				Image:  parts[2],
 				Status: parts[3],
 			})

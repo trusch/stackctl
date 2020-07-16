@@ -34,7 +34,7 @@ var restartCmd = &cobra.Command{
 	Short: "restart all or some services",
 	Long:  `restart all or some services.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("compose-file")
+		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)

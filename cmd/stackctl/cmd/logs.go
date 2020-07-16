@@ -42,7 +42,7 @@ var logsCmd = &cobra.Command{
 			follow bool
 			err    error
 		)
-		file, _ := cmd.Flags().GetString("compose-file")
+		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)

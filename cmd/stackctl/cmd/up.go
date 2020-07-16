@@ -28,18 +28,18 @@ import (
 	"github.com/trusch/stackctl/pkg/compose"
 )
 
-// resetCmd represents the reset command
-var resetCmd = &cobra.Command{
-	Use:   "reset",
-	Short: "kill and remove everything and burn down your volumes",
-	Long:  `kill and remove everything and burn down your volumes.`,
+// upCmd represents the up command
+var upCmd = &cobra.Command{
+	Use:   "up",
+	Short: "up your pod",
+	Long:  `up your pod.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
-		err = actions.Reset(cmd.Context(), project)
+		err = actions.Up(cmd.Context(), project)
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -47,15 +47,7 @@ var resetCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(resetCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// resetCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// resetCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.AddCommand(upCmd)
+	upCmd.Flags().String("image", "", "override image")
+	upCmd.Flags().String("with-pr", "", "override image by using the PR template")
 }

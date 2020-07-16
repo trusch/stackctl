@@ -34,7 +34,7 @@ var statusCmd = &cobra.Command{
 	Short: "check your stacks status",
 	Long:  `check your stacks status.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		file, _ := cmd.Flags().GetString("compose-file")
+		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
