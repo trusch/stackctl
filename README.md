@@ -26,8 +26,8 @@ services:
 You can now easily spin that up by using `stackctl up`:
 
 ```bash
-➜  test-project git:(master) ✗ stackctl up
-➜  test-project git:(master) ✗ stackctl status
+➜ stackctl up
+➜ stackctl status
        ID      |  NAME   |              IMAGE              |      STATUS
 ---------------+---------+---------------------------------+-------------------
   2d2d21f7a4f5 | alpine1 | docker.io/library/alpine:latest | Up 3 seconds ago
@@ -37,32 +37,32 @@ You can now easily spin that up by using `stackctl up`:
 You also have more fine grained control over the process if you want:
 
 ```bash
-➜  test-project git:(master) ✗ stackctl create
+➜ stackctl create
 INFO[0000] creating pod
 INFO[0000] creating container for alpine1
 INFO[0000] creating container for alpine2
-➜  test-project git:(master) ✗ stackctl status
+➜ stackctl status
        ID      |  NAME   |              IMAGE              | STATUS
 ---------------+---------+---------------------------------+----------
   612c7e3e1b18 | alpine1 | docker.io/library/alpine:latest | Created
   6361bbfad2ae | alpine2 | docker.io/library/alpine:latest | Created
-➜  test-project git:(master) ✗ stackctl start alpine1
+➜ stackctl start alpine1
 INFO[0000] starting container for alpine1
-➜  test-project git:(master) ✗ stackctl status
+➜ stackctl status
        ID      |  NAME   |              IMAGE              |      STATUS
 ---------------+---------+---------------------------------+-------------------
   612c7e3e1b18 | alpine1 | docker.io/library/alpine:latest | Up 2 seconds ago
   6361bbfad2ae | alpine2 | docker.io/library/alpine:latest | Created
-➜  test-project git:(master) ✗ stackctl start alpine2
+➜ stackctl start alpine2
 INFO[0000] starting container for alpine2
-➜  test-project git:(master) ✗ stackctl status
+➜ stackctl status
        ID      |  NAME   |              IMAGE              |      STATUS
 ---------------+---------+---------------------------------+--------------------
   612c7e3e1b18 | alpine1 | docker.io/library/alpine:latest | Up 14 seconds ago
   6361bbfad2ae | alpine2 | docker.io/library/alpine:latest | Up 8 seconds ago
-➜  test-project git:(master) ✗ stackctl stop
+➜ stackctl stop
 INFO[0000] stopping pod
-➜  test-project git:(master) ✗ stackctl remove
+➜ stackctl remove
 INFO[0000] removing pod
 ```
 
@@ -77,7 +77,7 @@ If you want to really rerender the image and start a new container from this use
 You can override the image that is used when recreating a service without touching your compose file. Just supply it as argument to the `stackctl recreate` call:
 
 ```bash
-➜  test-project git:(master) ✗ stackctl recreate alpine1 --image alpine:edge
+➜ stackctl recreate alpine1 --image alpine:edge
 INFO[0000] start service alpine1
 INFO[0001] remove service alpine1
 INFO[0001] create service alpine1
@@ -89,7 +89,7 @@ Writing manifest to image destination
 Storing signatures
 93a9ee4f683ed714ac5ddae50652df186feed762acc7a7f7f5af07ab730690be
 INFO[0006] start service alpine1
-➜  test-project git:(master) ✗ stackctl status
+➜ stackctl status
        ID      |  NAME   |              IMAGE              |      STATUS
 ---------------+---------+---------------------------------+--------------------
   93a9ee4f683e | alpine1 | docker.io/library/alpine:edge   | Up 2 seconds ago
@@ -100,7 +100,7 @@ INFO[0006] start service alpine1
 If you have images build from your CI for pull requests of specific components you can also use the special config directive `x-pr-template` to reference the PRs while recreating.
 
 ```bash
-➜  test-project git:(master) ✗ cat compose.yaml
+➜ cat compose.yaml
 version: "3.8"
 x-pr-template: "your-registry.io/pr-templates/{{ .Service }}:{{ .PR }}"
 services:
@@ -110,7 +110,7 @@ services:
   alpine2:
     image: alpine
     command: ["tail", "-f", "/dev/null"]
-➜  test-project git:(master) ✗ stackctl recreate alpine1 --with-pr 123
+➜ stackctl recreate alpine1 --with-pr 123
 INFO[0000] stop service alpine1
 INFO[0001] remove service alpine1
 INFO[0001] create service alpine1
