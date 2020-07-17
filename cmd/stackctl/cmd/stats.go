@@ -28,18 +28,19 @@ import (
 	"github.com/trusch/stackctl/pkg/compose"
 )
 
-// createCmd represents the create command
-var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "create creates the whole stack or just single components",
-	Long:  `create creates the whole stack or just single components.`,
+// statsCmd represents the stats command
+var statsCmd = &cobra.Command{
+	Use:   "stats",
+	Short: "stats shows stats for all or some services",
+	Long:  `stats shows stats for all or some services.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
-		err = actions.Create(cmd.Context(), project, args)
+		follow, _ := cmd.Flags().GetBool("follow")
+		err = actions.Stats(cmd.Context(), project, args, follow)
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -47,15 +48,15 @@ var createCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(createCmd)
-
+	rootCmd.AddCommand(statsCmd)
+	statsCmd.Flags().BoolP("follow", "f", false, "see live updates")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// createCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// statsCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// statsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

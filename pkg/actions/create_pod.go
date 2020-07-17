@@ -6,9 +6,11 @@ import (
 	"strings"
 
 	"github.com/compose-spec/compose-go/types"
+	"github.com/sirupsen/logrus"
 )
 
 func CreatePod(ctx context.Context, project *types.Project) error {
+	logrus.Info("creating pod")
 	err := CreateVolumes(ctx, project)
 	if err != nil {
 		return err

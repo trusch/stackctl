@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/compose-spec/compose-go/types"
+	"github.com/sirupsen/logrus"
 )
 
 func CreateServices(ctx context.Context, project *types.Project) error {
@@ -19,6 +20,7 @@ func CreateServices(ctx context.Context, project *types.Project) error {
 }
 
 func CreateService(ctx context.Context, project *types.Project, name string) error {
+	logrus.Infof("creating service %s", name)
 	svc, err := project.GetService(name)
 	if err != nil {
 		return err

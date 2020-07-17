@@ -39,22 +39,9 @@ var startCmd = &cobra.Command{
 		if err != nil {
 			logrus.Fatal(err)
 		}
-		if len(args) == 0 {
-			logrus.Infof("starting pod")
-			err = actions.StartPod(cmd.Context(), project)
-			if err != nil {
-				logrus.Fatal(err)
-			}
-		} else {
-			for _, svc := range project.ServiceNames() {
-				if args[0] == svc {
-					logrus.Infof("starting container for %s", svc)
-					err = actions.StartService(cmd.Context(), project, svc)
-					if err != nil {
-						logrus.Fatal(err)
-					}
-				}
-			}
+		err = actions.Start(cmd.Context(), project, args)
+		if err != nil {
+			logrus.Fatal(err)
 		}
 	},
 }

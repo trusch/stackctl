@@ -37,22 +37,9 @@ var removeCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		file, _ := cmd.Flags().GetStringSlice("compose-file")
 		project, err := compose.Load(file)
-		if len(args) == 0 {
-			logrus.Infof("removing pod")
-			err = actions.RemovePod(cmd.Context(), project)
-			if err != nil {
-				logrus.Fatal(err)
-			}
-		} else {
-			for _, svc := range project.ServiceNames() {
-				if args[0] == svc {
-					logrus.Infof("removing service %s", svc)
-					err = actions.RemoveService(cmd.Context(), project, svc)
-					if err != nil {
-						logrus.Fatal(err)
-					}
-				}
-			}
+		err = actions.Remove(cmd.Context(), project, args)
+		if err != nil {
+			logrus.Fatal(err)
 		}
 	},
 }

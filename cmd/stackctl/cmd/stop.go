@@ -39,23 +39,7 @@ var stopCmd = &cobra.Command{
 		if err != nil {
 			logrus.Fatal(err)
 		}
-		if len(args) == 0 {
-			logrus.Infof("stopping pod")
-			err = actions.StopPod(cmd.Context(), project)
-			if err != nil {
-				logrus.Fatal(err)
-			}
-		} else {
-			for _, component := range project.ServiceNames() {
-				if args[0] == component {
-					logrus.Infof("stopping container for %s", component)
-					err = actions.StopService(cmd.Context(), project, component)
-					if err != nil {
-						logrus.Fatal(err)
-					}
-				}
-			}
-		}
+		err = actions.Stop(cmd.Context(), project, args)
 	},
 }
 

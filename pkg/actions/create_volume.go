@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/compose-spec/compose-go/types"
+	"github.com/sirupsen/logrus"
 )
 
 func CreateVolumes(ctx context.Context, project *types.Project) error {
@@ -22,6 +23,7 @@ func CreateVolume(ctx context.Context, project *types.Project, volume string) er
 	if err := checkIfVolumeExists(ctx, volume); err == nil {
 		return nil
 	}
+	logrus.Infof("creating volume %s", volume)
 	volumeConfig, ok := project.Volumes[volume]
 	if !ok {
 		return errors.New("no such volume")
