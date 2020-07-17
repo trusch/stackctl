@@ -27,10 +27,6 @@ You can now easily spin that up by using `stackctl up`:
 
 ```bash
 ➜  test-project git:(master) ✗ stackctl up
-10afe49e8945da2d9c566927e5e50981c5da7733210217c30e6e68c3a57503b9
-2d2d21f7a4f5192721ac7bb3c80779bf8d642adeb9f34aca9e31d5acf82e7c6a
-bb71867756fb1590f2307de64e5e956fea71b439bc8be1f3f277596e2f2b6ab8
-10afe49e8945da2d9c566927e5e50981c5da7733210217c30e6e68c3a57503b9
 ➜  test-project git:(master) ✗ stackctl status
        ID      |  NAME   |              IMAGE              |      STATUS
 ---------------+---------+---------------------------------+-------------------
@@ -43,11 +39,8 @@ You also have more fine grained control over the process if you want:
 ```bash
 ➜  test-project git:(master) ✗ stackctl create
 INFO[0000] creating pod
-ad50a8518f24df9c8470a11cacee1adfa92277c5a54b73b3617ae7c19054c42b
 INFO[0000] creating container for alpine1
-612c7e3e1b18e2b84f647e2d289ff37518c9e2e6dba6847fd7e1204fc4fa907f
 INFO[0000] creating container for alpine2
-6361bbfad2ae69d04fac6d461e83dc1532eb2feb45941e0f5ed39646da7e5930
 ➜  test-project git:(master) ✗ stackctl status
        ID      |  NAME   |              IMAGE              | STATUS
 ---------------+---------+---------------------------------+----------
@@ -55,7 +48,6 @@ INFO[0000] creating container for alpine2
   6361bbfad2ae | alpine2 | docker.io/library/alpine:latest | Created
 ➜  test-project git:(master) ✗ stackctl start alpine1
 INFO[0000] starting container for alpine1
-test-project-alpine1
 ➜  test-project git:(master) ✗ stackctl status
        ID      |  NAME   |              IMAGE              |      STATUS
 ---------------+---------+---------------------------------+-------------------
@@ -63,7 +55,6 @@ test-project-alpine1
   6361bbfad2ae | alpine2 | docker.io/library/alpine:latest | Created
 ➜  test-project git:(master) ✗ stackctl start alpine2
 INFO[0000] starting container for alpine2
-test-project-alpine2
 ➜  test-project git:(master) ✗ stackctl status
        ID      |  NAME   |              IMAGE              |      STATUS
 ---------------+---------+---------------------------------+--------------------
@@ -71,10 +62,8 @@ test-project-alpine2
   6361bbfad2ae | alpine2 | docker.io/library/alpine:latest | Up 8 seconds ago
 ➜  test-project git:(master) ✗ stackctl stop
 INFO[0000] stopping pod
-ad50a8518f24df9c8470a11cacee1adfa92277c5a54b73b3617ae7c19054c42b
 ➜  test-project git:(master) ✗ stackctl remove
 INFO[0000] removing pod
-ad50a8518f24df9c8470a11cacee1adfa92277c5a54b73b3617ae7c19054c42b
 ```
 
 If you want to restart a service, but not rerendering the image, you can do so using `stackctl restart alpine1`
@@ -90,9 +79,7 @@ You can override the image that is used when recreating a service without touchi
 ```bash
 ➜  test-project git:(master) ✗ stackctl recreate alpine1 --image alpine:edge
 INFO[0000] start service alpine1
-d039cdd3b04329a53cc3fbbdd352e2850e77fee9334147868a8d9c9102ed5dca
 INFO[0001] remove service alpine1
-d039cdd3b04329a53cc3fbbdd352e2850e77fee9334147868a8d9c9102ed5dca
 INFO[0001] create service alpine1
 Trying to pull docker.io/library/alpine:edge...
 Getting image source signatures
@@ -102,7 +89,6 @@ Writing manifest to image destination
 Storing signatures
 93a9ee4f683ed714ac5ddae50652df186feed762acc7a7f7f5af07ab730690be
 INFO[0006] start service alpine1
-test-project-alpine1
 ➜  test-project git:(master) ✗ stackctl status
        ID      |  NAME   |              IMAGE              |      STATUS
 ---------------+---------+---------------------------------+--------------------
@@ -125,10 +111,11 @@ services:
     image: alpine
     command: ["tail", "-f", "/dev/null"]
 ➜  test-project git:(master) ✗ stackctl recreate alpine1 --with-pr 123
-[...]
-INFO[0000] create service alpine1
+INFO[0000] stop service alpine1
+INFO[0001] remove service alpine1
+INFO[0001] create service alpine1
 Trying to pull your-registry.io/pr-templates/alpine1:123...
-
+[...]
 ```
 
 You can also supply a service local `x-pr-template` directive that takes precedence over the global template in case the PR image name is not simply constructable by using the service name and the PR number (like if you have two services which have different names, but the same image repository).
