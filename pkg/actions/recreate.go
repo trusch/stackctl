@@ -39,7 +39,7 @@ func Recreate(ctx context.Context, project *types.Project, svcs []string) error 
 		return nil
 	}
 	for _, svc := range svcs {
-		logrus.Infof("start service %s", svc)
+		logrus.Infof("stop service %s", svc)
 		err := StopService(ctx, project, svc)
 		if err != nil {
 			logrus.Warn(err)

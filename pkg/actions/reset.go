@@ -2,8 +2,6 @@ package actions
 
 import (
 	"context"
-	"os"
-	"os/exec"
 
 	"github.com/compose-spec/compose-go/types"
 )
@@ -22,8 +20,5 @@ func RemoveVolumes(ctx context.Context, project *types.Project) error {
 	for _, vol := range project.VolumeNames() {
 		args = append(args, vol)
 	}
-	cmd := exec.CommandContext(ctx, "podman", args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	return run(ctx, "podman", args...)
 }

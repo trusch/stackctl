@@ -3,8 +3,6 @@ package actions
 import (
 	"context"
 	"errors"
-	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/compose-spec/compose-go/types"
@@ -64,13 +62,10 @@ func CreateVolume(ctx context.Context, project *types.Project, volume string) er
 		}
 		args = append(args, "--label", builder.String())
 	}
-	cmd := exec.CommandContext(ctx, "podman", args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	return run(ctx, "podman", args...)
 }
 
 func checkIfVolumeExists(ctx context.Context, name string) error {
 	args := []string{"volume", "inspect", name}
-	return exec.CommandContext(ctx, "podman", args...).Run()
+	return run(ctx, "podman", args...)
 }

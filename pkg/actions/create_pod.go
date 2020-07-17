@@ -2,8 +2,6 @@ package actions
 
 import (
 	"context"
-	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 
@@ -51,8 +49,5 @@ func CreatePod(ctx context.Context, project *types.Project) error {
 		}
 	}
 
-	cmd := exec.CommandContext(ctx, "podman", args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	return run(ctx, "podman", args...)
 }

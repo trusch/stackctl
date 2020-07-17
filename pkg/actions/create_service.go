@@ -3,8 +3,6 @@ package actions
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/compose-spec/compose-go/types"
@@ -100,10 +98,7 @@ func CreateService(ctx context.Context, project *types.Project, name string) err
 	}
 
 	// run it
-	cmd := exec.CommandContext(ctx, "podman", args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	return run(ctx, "podman", args...)
 }
 
 func containerName(project *types.Project, service string) string {
