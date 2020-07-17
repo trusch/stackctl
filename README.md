@@ -78,7 +78,7 @@ You can override the image that is used when recreating a service without touchi
 
 ```bash
 ➜ stackctl recreate alpine1 --image alpine:edge
-INFO[0000] start service alpine1
+INFO[0000] stop service alpine1
 INFO[0001] remove service alpine1
 INFO[0001] create service alpine1
 Trying to pull docker.io/library/alpine:edge...
