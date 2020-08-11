@@ -61,6 +61,11 @@ func CreateService(ctx context.Context, project *types.Project, name string) err
 		args = append(args, "-v", source+":"+target)
 	}
 
+	// add linked services as localhost /etc/hosts entries
+	for _, link := range svc.Links {
+		args = append(args, "--add-host", link+":127.0.0.1")
+	}
+
 	// set entrypoint
 	if len(svc.Entrypoint) > 0 {
 		args = append(args, "--entrypoint", strings.Join(svc.Entrypoint, " "))
