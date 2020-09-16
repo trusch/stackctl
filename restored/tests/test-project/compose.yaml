@@ -1,0 +1,9 @@
+version: "3.8"
+x-pr-template: "your-registry.io/pr-templates/{{ .Service }}:{{ .PR }}"
+services:
+  alpine1:
+    image: alpine
+    command: ["tail", "-f", "/dev/null"]
+  alpine2:
+    image: alpine
+    command: ["tail", "-f", "/dev/null"]

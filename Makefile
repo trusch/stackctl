@@ -1,5 +1,5 @@
 BINARIES=bin/stackctl
-IMAGE=containers.trusch.io/examples/stackctl:latest
+IMAGE=containers.trusch.io/stackctl:latest
 BASE_IMAGE=gcr.io/distroless/base:latest
 BUILD_IMAGE=golang:1.14
 
@@ -20,7 +20,7 @@ run: image
 image: .image
 .image: $(BINARIES) Makefile
 	$(eval ID=$(shell buildah from $(BASE_IMAGE)))
-	buildah copy $(ID) ./bin/* /bin/
+	buildah copy $(ID) $(shell pwd)/bin/* /bin/
 	buildah commit $(ID) $(IMAGE)
 	buildah rm $(ID)
 	touch .image

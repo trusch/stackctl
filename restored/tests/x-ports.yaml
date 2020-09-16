@@ -1,0 +1,7 @@
+version: "3.8"
+x-ports:
+  "1234": "1234"
+services:
+  alpine1:
+    image: alpine
+    command: ["tail", "-f", "/dev/null"]
