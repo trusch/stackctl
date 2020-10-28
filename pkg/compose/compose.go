@@ -46,6 +46,15 @@ func Load(files []string) (project *types.Project, err error) {
 	}
 	project.Name = filepath.Base(wd)
 
+	if len(project.Networks) == 0 {
+		project.Networks[project.Name+"-default"] = types.NetworkConfig{
+			Name: project.Name + "-default",
+		}
+		for idx := range project.Services {
+			project.Services[idx].Networks[project.Name+"-default"] = &types.ServiceNetworkConfig{}
+		}
+	}
+
 	return project, nil
 }
 

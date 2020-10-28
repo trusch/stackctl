@@ -3,6 +3,7 @@ package actions
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/compose-spec/compose-go/types"
@@ -36,8 +37,13 @@ func CreateService(ctx context.Context, project *types.Project, name string) err
 		}
 	}
 
+	// add networks
+	for net := range svc.Networks {
+		args = append(args, "--net", project.Name+"-"+net)
+	}
+
 	// add volumes
-	for _, vol := range append(svc.Volumes) {
+	for _, vol := range svc.Volumes {
 		args = append(args, "-v", vol.Source+":"+vol.Target)
 	}
 
@@ -61,10 +67,12 @@ func CreateService(ctx context.Context, project *types.Project, name string) err
 		args = append(args, "-v", source+":"+target)
 	}
 
-	// add linked services as localhost /etc/hosts entries
-	for _, link := range svc.Links {
-		args = append(args, "--add-host", link+":127.0.0.1")
-	}
+	// add linked services as localhost /etc/hosts entries (not anymore because we don't use the same network namespace for all services anymore)
+	/*
+		for _, link := range svc.Links {
+			args = append(args, "--add-host", link+":127.0.0.1")
+		}
+	*/
 
 	// set entrypoint
 	if len(svc.Entrypoint) > 0 {
@@ -91,6 +99,23 @@ func CreateService(ctx context.Context, project *types.Project, name string) err
 		for k, v := range svc.Labels {
 			args = append(args, "--label", fmt.Sprintf("%s=%s", k, v))
 		}
+	}
+
+	// set port forwardings
+	for _, port := range svc.Ports {
+		builder := &strings.Builder{}
+		if port.HostIP != "" {
+			builder.WriteString(port.HostIP)
+			builder.WriteString(":")
+		}
+		builder.WriteString(strconv.Itoa(int(port.Published)))
+		builder.WriteString(":")
+		builder.WriteString(strconv.Itoa(int(port.Target)))
+		if port.Protocol != "" {
+			builder.WriteString("/")
+			builder.WriteString(port.Protocol)
+		}
+		args = append(args, "-p", builder.String())
 	}
 
 	// add pod label

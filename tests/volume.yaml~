@@ -1,0 +1,5 @@
+version: "3.8"
+services:
+  alpine1:
+    image: alpine
+    command: ["tail", "-f", "/dev/null"]

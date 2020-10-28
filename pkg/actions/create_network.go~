@@ -64,7 +64,6 @@ func CreateVolume(ctx context.Context, project *types.Project, volume string) er
 		}
 		args = append(args, "--label", builder.String())
 	}
-	args = append(args, volume)
 	return run(ctx, "podman", args...)
 }
 
