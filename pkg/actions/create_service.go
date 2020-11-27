@@ -96,6 +96,14 @@ func CreateService(ctx context.Context, project *types.Project, name string) err
 	// add pod label
 	args = append(args, "--label", "pod="+project.Name)
 
+	for name, limit := range svc.Ulimits {
+		if limit.Single > 0 {
+			args = append(args, "--ulimit", fmt.Sprintf("%v=%v", name, limit.Single))
+		} else {
+			args = append(args, "--ulimit", fmt.Sprintf("%v=%v:%v", name, limit.Soft, limit.Hard))
+		}
+	}
+
 	// set image
 	args = append(args, svc.Image)
 
