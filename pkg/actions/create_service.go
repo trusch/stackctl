@@ -42,6 +42,8 @@ func CreateService(ctx context.Context, project *types.Project, name string) err
 		args = append(args, "--net", project.Name+"-"+net)
 	}
 
+	args = append(args, "--network-alias", name)
+
 	// add volumes
 	for _, vol := range svc.Volumes {
 		args = append(args, "-v", vol.Source+":"+vol.Target)
@@ -66,13 +68,6 @@ func CreateService(ctx context.Context, project *types.Project, name string) err
 		}
 		args = append(args, "-v", source+":"+target)
 	}
-
-	// add linked services as localhost /etc/hosts entries (not anymore because we don't use the same network namespace for all services anymore)
-	/*
-		for _, link := range svc.Links {
-			args = append(args, "--add-host", link+":127.0.0.1")
-		}
-	*/
 
 	// set entrypoint
 	if len(svc.Entrypoint) > 0 {
