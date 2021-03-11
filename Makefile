@@ -1,7 +1,7 @@
 BINARIES=bin/stackctl
 IMAGE=containers.trusch.io/stackctl:latest
 BASE_IMAGE=gcr.io/distroless/base:latest
-BUILD_IMAGE=golang:1.14
+BUILD_IMAGE=golang:1.16
 
 GOOS=linux
 GOARCH=amd64
